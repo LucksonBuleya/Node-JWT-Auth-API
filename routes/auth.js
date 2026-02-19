@@ -2,7 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import User from "../model/User.js";
 import bcrypt from 'bcryptjs';
-import { registerValidation } from '../validation.js';
+import { loginValidation, registerValidation } from '../validation.js';
 
 
 //creating a router instance to define routes
@@ -47,8 +47,22 @@ router.post('/register', async (req, res) => {
     }
 });
 
-//router.post('/login', (req, res) => {
-// 
-//});
+//Login
+router.post('/login', async (req, res) => {
+
+    //validating the request body using the loginValidation function
+    const { error } = loginValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+        //checking if the email already exists in the database
+        const user = await User.findOne({ email: req.body.email });
+        if (!user) return res.status(400).send('Email is not found');
+
+        //Password is correct
+        const validPass = await bcrypt.compare(req.body.password, user.password);
+        if(!validPass) return res.status(400).send('Invalid password')
+        
+        res.send('Login successful!')
+});
 
 export default router;
