@@ -1,6 +1,6 @@
 import express from 'express';
-import mongoose from 'mongoose';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -10,14 +10,6 @@ const app = express();
 
 //import the auth routes
 import authRoutes from './routes/auth.js';
-
-//route middleware
-app.use('/api/user', authRoutes);
-
-
-//define the port
-const PORT = process.env.PORT || 3000;
-
 
 //connecting to MongoDB using mongoose
 mongoose.connect(process.env.MONGO_URI)
@@ -30,5 +22,16 @@ mongoose.connect(process.env.MONGO_URI)
 .catch((err) => {
     console.error("Error connecting to MongoDB:", err);
 });
+
+// middleware
+app.use(express.json());
+
+//route middleware
+app.use('/api/user', authRoutes);
+
+//define the port
+const PORT = process.env.PORT || 3000;
+
+
 
 
